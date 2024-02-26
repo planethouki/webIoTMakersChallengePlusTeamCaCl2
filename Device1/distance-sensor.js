@@ -1,6 +1,6 @@
 import {requestI2CAccess} from "./node_modules/node-web-i2c/index.js";
 import VL53L0X from "@chirimen/vl53l0x";
-import sleep from "./sleep";
+import sleep from "./sleep.js";
 import fs from 'fs'
 
 export async function getOnce() {
