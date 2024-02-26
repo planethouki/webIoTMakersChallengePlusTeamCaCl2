@@ -5,67 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Team CaCl2 Control Panel</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-  <style>
-    .v-enter-active,
-    .v-leave-active {
-      transition: opacity 0.5s ease;
-    }
-
-    .v-enter-from,
-    .v-leave-to {
-      opacity: 0;
-    }
-  </style>
+  <link href="styles/5000.css" rel="stylesheet">
+  <link href="styles/style.css" rel="stylesheet">
 </head>
 <body>
 <div class="container">
-  <h1>チーム塩カル　コントロールパネル</h1>
+  <div class="d-flex justify-content-center mt-5 mb-3">
+    <div id="logo-upper" class="go-sen-chou-yen" data-text="チーム塩カル">
+      <span id="content-upper" class="logo" data-text="チーム塩カル" contenteditable>チーム塩カル</span>
+    </div>
+  </div>
+<!--  <span id="logo-lower" class="hoshii" data-text="欲しい！">-->
+<!--    <span id="content-lower" class="logo" data-text="欲しい！" contenteditable>欲しい！</span>-->
+<!--  </span>-->
   <div id="app">
-    <button type="button" class="btn btn-primary" @click="send" :disabled="sendDisabled">
+    <div class="text-center mb-3">
+      <button
+        type="button"
+        class="glow1"
+        @click="send"
+        :disabled="sendDisabled"
+      >起動</button>
+    </div>
+    <div class="text-center mb-4">
       <span v-if="sendDisabled" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-      起動
-    </button>
-    <transition>
-      <span v-if="sendMessage">
-        送信しました
-      </span>
-    </transition>
+      <transition>
+        <span v-if="sendMessage">送信しました</span>
+        <span v-else>&nbsp;</span>
+      </transition>
+    </div>
+    <div>
+      <textarea class="w-100" rows="10"
+      >{{ receiveMessage }}</textarea>
+    </div>
   </div>
 </div>
 
+<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
+<script src='https://beebotte.com/bbt.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script>
+</script>
 <script type="module">
   import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
-  import { RelayServer } from "https://chirimen.org/remote-connection/js/beta/RelayServer.js";
   const sleep = async (timeout = 1000) => new Promise(resolve => setTimeout(resolve, timeout));
-  const relay = RelayServer("chirimentest", "chirimenSocket" , WebSocket, "https://chirimen.org");
-  const channel = await relay.subscribe("cacl2-a695f3b2");
-  console.log("web socketリレーサービスに接続しました");
-  channel.onmessage = function () {
-    console.log("メッセージを受信しました");
-  };
+
+  const bbt = new BBT('LCA7kLsBdxveRIUo9S4ZZO9A');
 
   createApp({
     setup() {
       const sendMessage = ref(false)
       const sendDisabled = ref(false)
+      const receiveMessage = ref('')
+
+      bbt.subscribe({
+        channel: 'cacl2',
+        resource: 'res1'
+      }, (message) => {
+        console.log(message)
+        receiveMessage.value = JSON.stringify(message) + '\n' + receiveMessage.value
+      })
 
       async function send() {
-        console.log("メッセージを送信します")
-        sendDisabled.value = true
-        sendMessage.value = false
-        channel.send('hoge');
-        await sleep()
-        sendDisabled.value = false
-        sendMessage.value = true
-        await sleep()
-        sendMessage.value = false
+        try {
+          console.log("メッセージを送信します")
+          sendDisabled.value = true
+          sendMessage.value = false
+          await fetch('/.netlify/functions/pub1')
+          await sleep()
+          sendDisabled.value = false
+          sendMessage.value = true
+          await sleep()
+          sendMessage.value = false
+        } catch (e) {
+          console.error(e)
+          receiveMessage.value = e.message + '\n' + receiveMessage.value
+        }
       }
 
       return {
         send,
         sendMessage,
-        sendDisabled
+        sendDisabled,
+        receiveMessage
       }
     }
   }).mount('#app')
