@@ -60,7 +60,7 @@
 
       bbt.subscribe({
         channel: 'cacl2',
-        resource: 'res1'
+        resource: 'measure'
       }, (message) => {
         console.log(message)
         receiveMessage.value = JSON.stringify(message) + '\n' + receiveMessage.value
