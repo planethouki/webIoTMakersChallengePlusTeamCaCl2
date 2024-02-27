@@ -28,7 +28,7 @@ async function get(event, context) {
         }
         resolve({
           statusCode: 200,
-          body: JSON.stringify(res)
+          body: JSON.stringify({result: res})
         })
       });
   })

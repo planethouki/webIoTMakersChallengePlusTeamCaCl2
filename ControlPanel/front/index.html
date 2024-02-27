@@ -7,9 +7,11 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
   <link href="styles/5000.css" rel="stylesheet">
   <link href="styles/style.css" rel="stylesheet">
+  <link href="styles/index.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
+<div class="container mb-5">
+
   <div class="d-flex justify-content-center mt-5 mb-3">
     <div id="logo-upper" class="go-sen-chou-yen" data-text="チーム塩カル">
       <span id="content-upper" class="logo" data-text="チーム塩カル" contenteditable>チーム塩カル</span>
@@ -27,13 +29,6 @@
         :disabled="sendDisabled"
       >測定</button>
     </div>
-    <div class="text-center mb-3">
-      <button
-        type="button"
-        class="color2"
-        @click="measureGet"
-      ><span>取得</span></button>
-    </div>
     <div class="text-center mb-4">
       <span v-if="sendDisabled" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       <transition>
@@ -47,6 +42,23 @@
     </div>
   </div>
 </div>
+
+<nav>
+  <div class="container">
+    <ul class="nav nav-underline">
+      <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="./">Home</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="./data.html">Data</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
 
 <script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
 <script src='https://beebotte.com/bbt.js'></script>
@@ -71,11 +83,6 @@
         receiveMessage.value = JSON.stringify(message) + '\n' + receiveMessage.value
       })
 
-      async function measureGet() {
-        const result = await fetch('/.netlify/functions/measure', { method: 'GET' }).then(res => res.json())
-        receiveMessage.value = JSON.stringify(result) + '\n' + receiveMessage.value
-      }
-
       async function measureTrigger() {
         try {
           sendDisabled.value = true
@@ -93,7 +100,6 @@
       }
 
       return {
-        measureGet,
         measureTrigger,
         sendMessage,
         sendDisabled,
