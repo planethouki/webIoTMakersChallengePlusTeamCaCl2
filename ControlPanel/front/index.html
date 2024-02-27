@@ -19,18 +19,25 @@
 <!--    <span id="content-lower" class="logo" data-text="欲しい！" contenteditable>欲しい！</span>-->
 <!--  </span>-->
   <div id="app">
-    <div class="text-center mb-3">
+    <div class="text-center mb-5">
       <button
         type="button"
         class="glow1"
-        @click="send"
+        @click="measureTrigger"
         :disabled="sendDisabled"
-      >起動</button>
+      >測定</button>
+    </div>
+    <div class="text-center mb-3">
+      <button
+        type="button"
+        class="color2"
+        @click="measureGet"
+      ><span>取得</span></button>
     </div>
     <div class="text-center mb-4">
       <span v-if="sendDisabled" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       <transition>
-        <span v-if="sendMessage">送信しました</span>
+        <span v-if="sendMessage">完了しました</span>
         <span v-else>&nbsp;</span>
       </transition>
     </div>
@@ -64,9 +71,13 @@
         receiveMessage.value = JSON.stringify(message) + '\n' + receiveMessage.value
       })
 
-      async function send() {
+      async function measureGet() {
+        const result = await fetch('/.netlify/functions/measure', { method: 'GET' }).then(res => res.json())
+        receiveMessage.value = JSON.stringify(result) + '\n' + receiveMessage.value
+      }
+
+      async function measureTrigger() {
         try {
-          console.log("メッセージを送信します")
           sendDisabled.value = true
           sendMessage.value = false
           await fetch('/.netlify/functions/measure', { method: 'PUT' })
@@ -82,7 +93,8 @@
       }
 
       return {
-        send,
+        measureGet,
+        measureTrigger,
         sendMessage,
         sendDisabled,
         receiveMessage
