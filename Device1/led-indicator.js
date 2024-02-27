@@ -80,7 +80,7 @@ export async function loopBlink(time = 1000) {
 }
 
 
-export async function fastBlinkOnce(duration = 1000) {
+export async function fastBlinkOnce(duration = 2000) {
   try {
     let elapsedTime = 0
     while (elapsedTime < duration) {
