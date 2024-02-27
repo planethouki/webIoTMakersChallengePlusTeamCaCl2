@@ -69,7 +69,7 @@
           console.log("メッセージを送信します")
           sendDisabled.value = true
           sendMessage.value = false
-          await fetch('/.netlify/functions/measure')
+          await fetch('/.netlify/functions/measure', { method: 'PUT' })
           await sleep()
           sendDisabled.value = false
           sendMessage.value = true
