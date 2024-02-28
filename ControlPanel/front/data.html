@@ -12,26 +12,47 @@
 <body>
 <div class="container mb-5">
 
-  <div class="d-flex justify-content-center mt-5 mb-3">
+  <div class="d-flex justify-content-center mt-5">
     <div id="logo-upper" class="go-sen-chou-yen" data-text="チーム塩カル">
       <span id="content-upper" class="logo" data-text="チーム塩カル" contenteditable>チーム塩カル</span>
     </div>
   </div>
 
+  <div class="d-flex justify-content-center mb-3" style="transform: scale(0.5); margin-top: -1rem;">
+    <span class="hoshii" data-text="距離測定データ">
+      <span class="logo" data-text="距離測定データ" contenteditable>距離測定データ</span>
+    </span>
+  </div>
+
   <div id="app">
+    <div class="mb-5">
+      <canvas ref="canvas1"></canvas>
+    </div>
+
     <div class="text-center mb-5">
       <button
         type="button"
         class="color2"
         @click="measureGet"
-      ><span>データ取得</span></button>
+      ><span>データ更新</span></button>
     </div>
-    <div>
-      <canvas ref="canvas"></canvas>
+
+    <div class="d-flex justify-content-center mb-3" style="transform: scale(0.5); margin-top: 4rem;">
+      <span class="hoshii" data-text="塩カル散布実績">
+        <span class="logo" data-text="塩カル散布実績" contenteditable>塩カル散布実績</span>
+      </span>
     </div>
-    <div>
-      <textarea class="w-100" rows="10"
-      >{{ message }}</textarea>
+
+    <div class="mb-5">
+      <canvas ref="canvas2"></canvas>
+    </div>
+
+    <div class="text-center mb-5">
+      <button
+        type="button"
+        class="color2"
+        @click="spreadGet"
+      ><span>データ更新</span></button>
     </div>
   </div>
 
@@ -60,25 +81,30 @@
 <script src="https://cdn.jsdelivr.net/npm/moment@^2"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@^1"></script>
 <script type="module">
-  import { createApp, ref } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+  import { createApp, ref, onMounted } from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
 
   createApp({
     setup() {
       const message = ref('')
-      const canvas = ref(null)
-      const chart = ref(null)
+      const canvas1 = ref(null)
+      const canvas2 = ref(null)
+      const chart1 = ref(null)
+      const chart2 = ref(null)
 
       async function measureGet() {
         const response = await fetch('/.netlify/functions/measure', { method: 'GET' }).then(res => res.json())
-        message.value = JSON.stringify(response) + '\n' + message.value
 
-        const chartData = response.result.map((r) => ({x: r.ts, y: r.data}))
+        const chartData = response
+          .result
+          .map((r) => ({x: r.ts, y: r.data}))
+          .filter(({ y }) => y < 2000)
 
-        if (chart.value !== null) {
-          chart.value.data.datasets = chartData
-          chart.value.update()
-        } else {
-          chart.value = new Chart(canvas.value, {
+        if (chart1.value !== null) {
+          chart1.value.destroy()
+        }
+
+        {
+          chart1.value = new Chart(canvas1.value, {
             type: 'line',
             data: {
               datasets: [{
@@ -100,13 +126,57 @@
             }
           });
         }
+      }
+
+
+      async function spreadGet() {
+        const response = await fetch('/.netlify/functions/spread', { method: 'GET' }).then(res => res.json())
+
+        const chartData = response
+          .result
+          .map((r) => ({x: r.ts, y: r.data}))
+          .filter(({ y }) => y < 2000)
+
+        if (chart2.value !== null) {
+          chart2.value.destroy()
         }
 
+        {
+          chart2.value = new Chart(canvas2.value, {
+            type: 'bar',
+            data: {
+              datasets: [{
+                label: 'Count',
+                data: chartData,
+                pointHitRadius: 20
+              }]
+            },
+            options: {
+              borderColor: 'rgb(255, 99, 132)',
+              scales: {
+                x: {
+                  type: 'time',
+                },
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
+        }
+      }
+
+      onMounted(() => {
+        measureGet()
+        spreadGet()
+      })
 
       return {
         measureGet,
+        spreadGet,
         message,
-        canvas
+        canvas1,
+        canvas2
       }
     }
   }).mount('#app')

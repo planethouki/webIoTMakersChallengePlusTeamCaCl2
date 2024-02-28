@@ -112,7 +112,7 @@
 /* 「欲しい！」はロゴの右下にアラインがあるように配置　*/
 .hoshii {
     margin-top: -0.125em;
-    margin-left: 2.5em;
+    /*margin-left: 2.5em;*/
     text-align: right;
 }
 

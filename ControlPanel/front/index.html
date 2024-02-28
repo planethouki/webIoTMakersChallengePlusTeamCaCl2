@@ -12,14 +12,16 @@
 <body>
 <div class="container mb-5">
 
-  <div class="d-flex justify-content-center mt-5 mb-3">
+  <div class="d-flex justify-content-center mt-5">
     <div id="logo-upper" class="go-sen-chou-yen" data-text="チーム塩カル">
       <span id="content-upper" class="logo" data-text="チーム塩カル" contenteditable>チーム塩カル</span>
     </div>
   </div>
-<!--  <span id="logo-lower" class="hoshii" data-text="欲しい！">-->
-<!--    <span id="content-lower" class="logo" data-text="欲しい！" contenteditable>欲しい！</span>-->
-<!--  </span>-->
+  <div class="d-flex justify-content-center mb-3" style="transform: scale(0.5); margin-top: -1rem;">
+    <span id="logo-lower" class="hoshii" data-text="起動">
+      <span id="content-lower" class="logo" data-text="起動" contenteditable>起動</span>
+    </span>
+  </div>
   <div id="app">
     <div class="text-center mb-5">
       <button
@@ -27,12 +29,12 @@
         class="glow1"
         @click="measureTrigger"
         :disabled="sendDisabled"
-      >測定</button>
+      >測定のみ</button>
     </div>
     <div class="text-center mb-4">
       <span v-if="sendDisabled" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
       <transition>
-        <span v-if="sendMessage">完了しました</span>
+        <span v-if="sendMessage">{{ sendText }}</span>
         <span v-else>&nbsp;</span>
       </transition>
     </div>
@@ -103,7 +105,8 @@
         measureTrigger,
         sendMessage,
         sendDisabled,
-        receiveMessage
+        receiveMessage,
+        sendText: '完了しました'
       }
     }
   }).mount('#app')

@@ -38,10 +38,18 @@ class DistanceSensor {
 
   async getAverage(count = 5, interval = 500) {
     const values = []
-    for (let i = 0; i < count; i++) {
-      const result = await this.getOnce()
-      values.push(result.distance)
+    for (let i = 0; i < 20; i++) {
+      const { distance } = await this.getOnce()
+      if (distance < 2000) {
+        values.push(distance);
+      }
+      if (values.length >= count) {
+        break;
+      }
       await sleep(interval)
+    }
+    if (values.length === 0) {
+      throw new Error('Failed to get distance')
     }
     return {
       average: values.reduce((acc, cur) => acc + cur, 0) / count,
