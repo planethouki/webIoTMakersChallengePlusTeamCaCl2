@@ -41,7 +41,7 @@ async function analyze() {
   if (after.data - before.data > -10) {
     console.log('No need to spread', before, after)
     return {
-      isSpread: false,
+      isTriggerSpread: false,
     }
   }
 
@@ -60,7 +60,7 @@ async function analyze() {
   })
 
   return {
-    isSpread: true
+    isTriggerSpread: true
   }
 
 }
