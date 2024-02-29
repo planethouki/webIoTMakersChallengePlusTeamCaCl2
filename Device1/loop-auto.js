@@ -1,21 +1,34 @@
 import sleep from './sleep.js'
 import { getDistanceSensor } from "./distance-sensor.js";
+import { fastBlinkOnce } from "./led-indicator.js";
+import { getLogger } from "./logger.js";
 
-export async function loop24hour() {
-  const distanceSensor = await getDistanceSensor()
+const logger = getLogger()
 
+async function loop(mqttClient, milliseconds) {
   while (true) {
     try {
       const startTime = Date.now()
-      const result = await distanceSensor.getOnce()
-      // todo 散布するかどうかを判定
-      // todo 散布する処理を呼ぶ
+      logger.info('Periodic measurement start');
+      fastBlinkOnce()
+      const { average } = await getDistanceSensor().getAverage()
+      mqttClient.publish('cacl2/measure_result', JSON.stringify({
+        data: average,
+        write: true
+      }));
       const elapsedTime = Date.now() - startTime
-      await sleep(24 * 60 * 60 * 1000 - elapsedTime)
+      await sleep(milliseconds - elapsedTime)
     } catch (error) {
-      console.error(error)
+      logger.error(error)
       await sleep(10 * 1000)
     }
   }
 }
 
+export async function loop24hour(mqttClient) {
+  return loop(mqttClient, 24 * 60 * 60 * 1000)
+}
+
+export async function loopHour(mqttClient) {
+    return loop(mqttClient, 60 * 60 * 1000)
+}

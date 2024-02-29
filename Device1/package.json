@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "prepare": "curl -sSfLO https://chirimen.org/remote-connection/js/beta/RelayServer.js",
-    "start": "node main.js"
+    "start": "node main.js",
+    "dev": "node main.js | pino-pretty"
   },
   "dependencies": {
     "@chirimen/ads1015": "latest",
@@ -49,11 +50,17 @@
     "@chirimen/veml6070": "latest",
     "@chirimen/vl53l0x": "latest",
     "@chirimen/vl53l1x": "latest",
+    "axios": "^1.6.7",
     "dotenv": "^16.4.5",
     "mqtt": "^5.3.6",
     "node-web-gpio": "latest",
     "node-web-i2c": "latest",
     "pi-camera-connect": "^0.3.4",
+    "pino": "^8.19.0",
+    "symbol-sdk": "^3.1.0",
     "websocket": "^1.0.34"
+  },
+  "devDependencies": {
+    "pino-pretty": "^10.3.1"
   }
 }

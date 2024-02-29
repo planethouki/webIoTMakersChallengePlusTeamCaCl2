@@ -1,5 +1,8 @@
 import {requestGPIOAccess} from "./node_modules/node-web-gpio/dist/index.js"; // WebGPIO を使えるようにするためのライブラリをインポート
 import sleep from './sleep.js'
+import { getLogger } from "./logger.js";
+
+const logger = getLogger()
 
 class LedIndicator {
 
@@ -22,8 +25,8 @@ class LedIndicator {
       await this.port.write(0);
       this.isInitialized = true
     } catch (e) {
-      console.error('Failed to initialize LED indicator')
-      console.error(e)
+      logger.error('Failed to initialize LED indicator')
+      logger.error(e)
     }
   }
 
@@ -45,11 +48,22 @@ class LedIndicator {
 
 let instance = null
 
-export async function getLedIndicator() {
-  if (instance === null) {
-    instance = new LedIndicator()
-    await instance.init()
+export async function init() {
+  for (let i = 0; i < 5; i++) {
+    try {
+      instance = new LedIndicator()
+      await instance.init()
+      return;
+    } catch(e) {
+      await sleep(1000)
+    }
   }
+
+  instance = null;
+  throw new Error('Failed to initialize led indicator')
+}
+
+export function getLedIndicator() {
   return instance
 }
 
@@ -69,11 +83,11 @@ export async function loopBlink(time = 1000) {
     const startTs = Date.now()
     let elapsed = 0
     try {
-      const ledIndicator = await getLedIndicator()
+      const ledIndicator = getLedIndicator()
       await ledIndicator.toggle()
       elapsed = Date.now() - startTs
     } catch(e) {
-      console.error(e)
+      logger.error(e)
     }
     await sleep(Math.max(loopBlinkInterval - elapsed, 0))
   }
@@ -85,12 +99,12 @@ export async function fastBlinkOnce(duration = 2000) {
     let elapsedTime = 0
     while (elapsedTime < duration) {
       const startTime = Date.now()
-      const ledIndicator = await getLedIndicator()
+      const ledIndicator = getLedIndicator()
       await ledIndicator.toggle()
       await sleep(100)
       elapsedTime += Math.max(Date.now() - startTime, 100)
     }
   } catch(e) {
-    console.error(e)
+    logger.error(e)
   }
 }

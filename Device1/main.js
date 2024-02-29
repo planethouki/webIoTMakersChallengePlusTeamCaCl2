@@ -1,13 +1,19 @@
 import sleep from './sleep.js'
-import { getDistanceSensor } from "./distance-sensor.js";
-import { loopBlink, fastBlinkOnce } from "./led-indicator.js";
-import { loop24hour } from "./loop-auto.js";
+import { getDistanceSensor, init as initDistanceSensor } from "./distance-sensor.js";
+import { loopBlink, fastBlinkOnce, init as initLedIndicator } from "./led-indicator.js";
+import { loop24hour, loopHour } from "./loop-auto.js";
+import { getLogger } from "./logger.js";
 import mqtt from 'mqtt'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
-const distanceSensor = await getDistanceSensor()
+await initDistanceSensor()
+await initLedIndicator()
+
+loopBlink()
+
+const logger = getLogger()
 
 // https://beebotte.com/docs/mqtt
 const client =  mqtt.connect('mqtt://mqtt.beebotte.com',
@@ -15,29 +21,24 @@ const client =  mqtt.connect('mqtt://mqtt.beebotte.com',
 );
 
 client.on('message', async function (topic, message) {
-  console.log(topic + '   ' + message); // cacl2/measure   {"data":"trigger","ispublic":true,"ts":1709025518527}
+  logger.info(topic + '   ' + message); // cacl2/measure   {"data":"trigger","ispublic":true,"ts":1709025518527}
   if (topic === 'cacl2/measure_trigger') {
     const messageObj = JSON.parse(message);
     if (messageObj.data !== 'trigger') {
       return
     }
     fastBlinkOnce()
-    const distanceResult = await distanceSensor.getAverage()
-    console.log(distanceResult)
-    const response = {
-      data: distanceResult.average,
+    const { average } = await getDistanceSensor().getAverage()
+    client.publish('cacl2/measure_result', JSON.stringify({
+      data: average,
       write: true
-    }
-    client.publish('cacl2/measure_result', JSON.stringify(response));
+    }));
   }
 });
 
 client.subscribe('cacl2/measure_trigger');
 
-// setInterval(function() {
-//   client.publish('cacl2/res1', 'Hello World');
-// }, 1000 /* 1 second */);
 
-loopBlink()
 
-loop24hour()
+// loop24hour(client)
+loopHour(client)

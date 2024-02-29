@@ -1,6 +1,9 @@
 import {requestI2CAccess} from "./node_modules/node-web-i2c/index.js";
 import VL53L0X from "@chirimen/vl53l0x";
 import sleep from "./sleep.js";
+import { getLogger } from "./logger.js";
+
+const logger = getLogger()
 
 class DistanceSensor {
   isInitialized = false
@@ -22,14 +25,14 @@ class DistanceSensor {
       await this.vl.init(); // for Long Range Mode (<2m) : await vl.init(true);
       this.isInitialized = true
     } catch (e) {
-      console.error('Failed to initialize distance sensor')
-      console.error(e)
+      logger.error('Failed to initialize distance sensor')
+      logger.error(e)
     }
   }
 
   async getOnce() {
     const distance = await this.vl.getRange();
-    console.log(`${distance} [mm]`);
+    logger.info(`${distance} [mm]`);
     return {
       distance,
       timestamp: Date.now()
@@ -59,23 +62,8 @@ class DistanceSensor {
 }
 
 let instance = null
-let isInTryGet = false
 
-async function tryGetSingle() {
-  if (isInTryGet) {
-    throw new Error('Initialization of distance sensor is already in progress')
-  }
-  isInTryGet = true
-  try {
-    await tryInit()
-    isInTryGet = false
-  } catch (e) {
-    isInTryGet = false
-    throw e
-  }
-}
-
-async function tryInit() {
+export async function init() {
   for (let i = 0; i < 5; i++) {
     try {
       instance = new DistanceSensor()
@@ -90,9 +78,6 @@ async function tryInit() {
   throw new Error('Failed to initialize distance sensor')
 }
 
-export async function getDistanceSensor() {
-  if (instance === null) {
-    await tryGetSingle()
-  }
+export function getDistanceSensor() {
   return instance
 }
