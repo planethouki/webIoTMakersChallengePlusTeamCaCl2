@@ -47,7 +47,8 @@ async function put(event, context) {
           })
         }
         resolve({
-          statusCode: 200
+          statusCode: 200,
+          body: JSON.stringify({ success: true })
         })
       });
   })
