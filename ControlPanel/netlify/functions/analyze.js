@@ -38,7 +38,7 @@ async function analyze() {
 
   const [after, before] = resultOfTwo
 
-  if (before.data - after.data > -10) {
+  if (after.data - before.data > -10) {
     console.log('No need to spread', before, after)
     return {
       isSpread: false,
