@@ -1,6 +1,7 @@
 import {fastBlinkOnce} from "./led-indicator.js";
 import {getDistanceSensor} from "./distance-sensor.js";
 import {getThermoSensor} from "./thermo-sensor.js";
+import {writeBlockchain} from "./blockchain.js";
 
 export async function simpleMeasure(mqttClient) {
   fastBlinkOnce()
@@ -12,5 +13,6 @@ export async function simpleMeasure(mqttClient) {
       data: `${distance.average},${thermo.temperature.average},${thermo.humidity.average}`,
       write: true
     }));
+    writeBlockchain('measure', `${Date.now()},${distance.average},${thermo.temperature.average},${thermo.humidity.average}`);
   })
 }
