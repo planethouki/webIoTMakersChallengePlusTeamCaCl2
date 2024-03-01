@@ -1,14 +1,17 @@
 import sleep from './sleep.js'
 import { getDistanceSensor, init as initDistanceSensor } from "./distance-sensor.js";
+import { getThermoSensor, init as initThermoSensor } from "./thermo-sensor.js";
 import { loopBlink, fastBlinkOnce, init as initLedIndicator } from "./led-indicator.js";
 import { loop24hour, loopHour } from "./loop-auto.js";
 import { getLogger } from "./logger.js";
+import { simpleMeasure } from "./measure-util.js";
 import mqtt from 'mqtt'
 import dotenv from 'dotenv'
 
 dotenv.config()
 
 await initDistanceSensor()
+await initThermoSensor()
 await initLedIndicator()
 
 loopBlink()
@@ -27,12 +30,7 @@ client.on('message', async function (topic, message) {
     if (messageObj.data !== 'trigger') {
       return
     }
-    fastBlinkOnce()
-    const { average } = await getDistanceSensor().getAverage()
-    client.publish('cacl2/measure_result', JSON.stringify({
-      data: average,
-      write: true
-    }));
+    await simpleMeasure(client)
   }
 });
 

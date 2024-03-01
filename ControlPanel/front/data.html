@@ -94,10 +94,21 @@
       async function measureGet() {
         const response = await fetch('/.netlify/functions/measure', { method: 'GET' }).then(res => res.json())
 
-        const chartData = response
-          .result
-          .map((r) => ({x: r.ts, y: r.data}))
-          .filter(({ y }) => y < 2000)
+        const distanceData = [], temperatureData = [], humidityData = []
+
+        for (const { ts, data } of response.result) {
+          const [distance, temperature, humidity] = data.toString().split(',')
+          if (distance)
+            distanceData.push({x: ts, y: Number(distance)})
+          if (temperature)
+            temperatureData.push({x: ts, y: Number(temperature)})
+          if (humidity)
+            humidityData.push({x: ts, y: Number(humidity)})
+        }
+
+        const chartDistance = distanceData.filter(({ y }) => y < 2000)
+        const chartTemperature = temperatureData.filter(({ y }) => y < 100)
+        const chartHumidity = humidityData.filter(({ y }) => y < 100)
 
         if (chart1.value !== null) {
           chart1.value.destroy()
@@ -107,20 +118,48 @@
           chart1.value = new Chart(canvas1.value, {
             type: 'line',
             data: {
-              datasets: [{
-                label: 'Distance[mm]',
-                data: chartData,
-                pointHitRadius: 20
-              }]
+              datasets: [
+                {
+                  label: 'Distance[mm]',
+                  data: chartDistance,
+                  borderColor: 'rgb(255, 99, 132)',
+                  yAxisID: 'y-axis-1',
+                },
+                {
+                  label: 'Temperature[℃]',
+                  data: chartTemperature,
+                  borderColor: 'rgb(110,225,64)',
+                  yAxisID: 'y-axis-2',
+                },
+                {
+                  label: 'Humidity[%]',
+                  data: chartHumidity,
+                  borderColor: 'rgb(64,195,225)',
+                  yAxisID: 'y-axis-2',
+                },
+              ]
             },
             options: {
-              borderColor: 'rgb(255, 99, 132)',
+              pointHitRadius: 20,
               scales: {
                 x: {
                   type: 'time',
                 },
-                y: {
-                  beginAtZero: true
+                ['y-axis-1']: {
+                  id: 'y-axis-1',
+                  type: 'linear',
+                  position: 'left',
+                  ticks: {
+                    beginAtZero: true
+                  }
+                },
+                ['y-axis-2']: {
+                  id: 'y-axis-2',
+                  type: 'linear',
+                  position: 'right',
+                  ticks: {
+                    beginAtZero: true
+                  }
                 }
               }
             }

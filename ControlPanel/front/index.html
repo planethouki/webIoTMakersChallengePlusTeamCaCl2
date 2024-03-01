@@ -98,7 +98,8 @@
       }, (message) => {
         console.log(message)
         const date = new Date(message.ts)
-        const row = `[${date.toLocaleString()}] 測定が行われました。距離：${message.data}[mm]\n`
+        const [distance, temperature, humidity] = message.data.split(',')
+        const row = `[${date.toLocaleString()}] 測定が行われました。距離：${distance}[mm] 温度：${Number(temperature).toFixed(2)}[℃] 湿度：${Number(humidity).toFixed(2)}%`
         receiveMessage.value = row + '\n' + receiveMessage.value
       })
 
