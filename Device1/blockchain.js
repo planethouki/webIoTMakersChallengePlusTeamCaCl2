@@ -41,9 +41,11 @@ export async function writeBlockchain(type, value) {
   const signature = facade.signTransaction(keyPair, transaction);
   const jsonPayload = facade.transactionFactory.constructor.attachSignature(transaction, signature);
   const hash = facade.hashTransaction(transaction).toString();
-  logger.info(`Transaction hash: ${hash}`);
+  logger.info(`Blockchain Transaction hash: ${hash}`);
 
   await node.put("/transactions", jsonPayload).then((res) => res.data);
+
+  logger.info(`Blockchain Data: ${value}`);
 
 
 
