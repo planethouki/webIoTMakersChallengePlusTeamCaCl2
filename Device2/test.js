@@ -3,11 +3,10 @@ import PCA9685 from "@chirimen/pca9685";
 import { requestGPIOAccess } from "./node_modules/node-web-gpio/dist/index.js";
 const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
-const dcMotorPortAddresses = [20, 21]; // HブリッジコントローラをつなぐGPIOポート番号
+const dcMotorPortAddresses = [20, 26]; // HブリッジコントローラをつなぐGPIOポート番号
 let dcMotorPorts;
 let pca9685;
 
-servo();
 
 // DC motor control
 async function dcMotorInit() {

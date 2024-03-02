@@ -149,17 +149,11 @@
                   id: 'y-axis-1',
                   type: 'linear',
                   position: 'left',
-                  ticks: {
-                    beginAtZero: true
-                  }
                 },
                 ['y-axis-2']: {
                   id: 'y-axis-2',
                   type: 'linear',
                   position: 'right',
-                  ticks: {
-                    beginAtZero: true
-                  }
                 }
               },
               plugins: {
@@ -179,40 +173,76 @@
 
 
       async function spreadGet() {
-        const response = await fetch('/.netlify/functions/spread', { method: 'GET' }).then(res => res.json())
+        const [responseSpread, responseRemaining] = await Promise.all([
+          fetch('/.netlify/functions/spread', { method: 'GET' }).then(res => res.json()),
+          fetch('/.netlify/functions/remaining', { method: 'GET' }).then(res => res.json())
+        ])
 
-        const chartData = response
+        const chartSpread = responseSpread
           .result
-          .map((r) => ({x: r.ts, y: r.data}))
-          .filter(({ y }) => y < 2000)
+          .map(({ ts }) => ({x: ts, y: 1}))
+
+        const chartRemaining = responseRemaining
+          .result
+          .map(({ ts, data }) => {
+            const [remaining] = data.toString().split(',')
+            return {x: ts, y: remaining}
+          })
 
         if (chart2.value !== null) {
           chart2.value.destroy()
         }
 
-        {
-          chart2.value = new Chart(canvas2.value, {
-            type: 'bar',
-            data: {
-              datasets: [{
-                label: 'Count',
-                data: chartData,
-                pointHitRadius: 20
-              }]
+        chart2.value = new Chart(canvas2.value, {
+          type: 'scatter',
+          data: {
+            datasets: [
+              {
+                label: '散布',
+                data: chartSpread,
+                pointHitRadius: 20,
+                yAxisID: 'y-axis-1',
+                borderColor: 'rgb(255, 99, 132)',
+              },
+              {
+                label: '残量',
+                type: 'line',
+                data: chartRemaining,
+                pointHitRadius: 20,
+                yAxisID: 'y-axis-2',
+                borderColor: 'rgb(110,225,64)',
+              }
+            ]
+          },
+          options: {
+            pointHitRadius: 20,
+            scales: {
+              x: {
+                type: 'time',
+              },
+              ['y-axis-1']: {
+                id: 'y-axis-1',
+                type: 'linear',
+                position: 'left',
+              },
+              ['y-axis-2']: {
+                id: 'y-axis-2',
+                type: 'linear',
+                position: 'right',
+              }
             },
-            options: {
-              borderColor: 'rgb(255, 99, 132)',
-              scales: {
-                x: {
-                  type: 'time',
-                },
-                y: {
-                  beginAtZero: true
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  title: function (tooltipItems, data) {
+                    const date = new Date(tooltipItems[0].label)
+                    return date.toLocaleString()
+                  }
                 }
               }
             }
-          });
-        }
+          }
+        });
       }
 
       onMounted(() => {
