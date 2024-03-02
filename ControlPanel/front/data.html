@@ -161,6 +161,16 @@
                     beginAtZero: true
                   }
                 }
+              },
+              plugins: {
+                tooltip: {
+                  callbacks: {
+                    title: function(tooltipItems, data) {
+                      const date = new Date(tooltipItems[0].label)
+                      return date.toLocaleString()
+                    }
+                  }
+                }
               }
             }
           });
