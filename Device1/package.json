@@ -4,8 +4,8 @@
   "type": "module",
   "scripts": {
     "prepare": "curl -sSfLO https://chirimen.org/remote-connection/js/beta/RelayServer.js",
-    "start": "node main.js",
-    "dev": "node main.js | pino-pretty"
+    "start": "node main1.js",
+    "dev": "node main1.js | pino-pretty"
   },
   "dependencies": {
     "@chirimen/ads1015": "latest",
