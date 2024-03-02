@@ -2,7 +2,7 @@ import sleep from './sleep.js'
 import { getDistanceSensor, init as initDistanceSensor } from "./distance-sensor.js";
 import { getThermoSensor, init as initThermoSensor } from "./thermo-sensor.js";
 import { loopBlink, fastBlinkOnce, init as initLedIndicator } from "./led-indicator.js";
-import { loop24hour, loopHour } from "./loop-auto.js";
+import { loopHour, loop24hour4am } from "./loop-auto.js";
 import { getLogger } from "./logger.js";
 import { simpleMeasure } from "./measure-util.js";
 import mqtt from 'mqtt'
@@ -38,5 +38,5 @@ client.subscribe('cacl2/measure_trigger');
 
 
 
-// loop24hour(client)
+loop24hour4am(client)
 loopHour(client)
