@@ -1,0 +1,10 @@
+{
+  "uid": "app",
+  "append": true,
+  "watch": true,
+  "script": "main2.js",
+  "sourceDir": "/home/pi/myApp",
+  "logFile": "/home/pi/forever-log.log",
+  "outFile": "/home/pi/forever-out.log",
+  "errFile": "/home/pi/forever-error.log"
+}
