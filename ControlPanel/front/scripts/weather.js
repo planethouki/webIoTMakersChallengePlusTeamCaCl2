@@ -1,3 +1,6 @@
+// https://github.com/open-meteo/open-meteo/issues/287
+// https://www.jodc.go.jp/data_format/weather-code_j.html
+
 const WEATHER_TABLE = {
   "0": "快晴",
   "1": "晴れ",
