@@ -12,6 +12,7 @@ class ServoMotor {
     // servo setting for sg90
     // Servo PWM pulse: min=0.0011[sec], max=0.0019[sec] angle=+-60[deg]
     await this.pca9685.init(0.001, 0.002, 30);
+    await this.pca9685.setServo(0, -30);
   }
 
   async setServo(a, angle) {

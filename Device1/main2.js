@@ -6,6 +6,7 @@ import { writeBlockchain } from "./blockchain.js";
 import { getDistanceSensor, init as initDistanceSensor } from "./distance-sensor.js";
 import { servoMotorInit, getServoMotor } from "./servo-motor.js";
 import { dcMotorInit, getDcMotor } from "./dc-motor.js";
+import axios from 'axios';
 
 dotenv.config();
 
@@ -23,14 +24,14 @@ const distanceSensor = getDistanceSensor();
 
 async function spread() {
   await dcMotor.free();
-  await sleep(500);
+  await servoMotor.setServo(0, 30);
+  await sleep(100);
   await dcMotor.fwd();
-  await sleep(1000);
+  await sleep(8000);
+  await dcMotor.brake();
+  await sleep(100);
   await servoMotor.setServo(0, -30);
   await sleep(100);
-  await servoMotor.setServo(0, 30);
-  await sleep(1000);
-  await dcMotor.brake();
 }
 
 const mqttClient =  mqtt.connect('mqtt://mqtt.beebotte.com',
@@ -50,6 +51,7 @@ mqttClient.on('message', async function (topic, message) {
       write: true
     }));
     writeBlockchain('spread', Date.now().toString());
+    axios.put(process.env.NOTIFICATION_ENDPOINT)
     const { distance } = await distanceSensor.getOnce()
     mqttClient.publish('cacl2/remaining_result', JSON.stringify({
       data: distance,
