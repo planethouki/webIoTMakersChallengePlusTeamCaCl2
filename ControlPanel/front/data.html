@@ -126,19 +126,19 @@
             data: {
               datasets: [
                 {
-                  label: 'Distance[mm]',
+                  label: '距離[mm]',
                   data: chartDistance,
                   borderColor: 'rgb(255, 99, 132)',
                   yAxisID: 'y-axis-1',
                 },
                 {
-                  label: 'Temperature[℃]',
+                  label: '温度[℃]',
                   data: chartTemperature,
                   borderColor: 'rgb(110,225,64)',
                   yAxisID: 'y-axis-2',
                 },
                 {
-                  label: 'Humidity[%]',
+                  label: '湿度[%]',
                   data: chartHumidity,
                   borderColor: 'rgb(64,195,225)',
                   yAxisID: 'y-axis-2',
@@ -155,14 +155,34 @@
                   id: 'y-axis-1',
                   type: 'linear',
                   position: 'left',
+                  ticks: {
+                    color: 'rgb(255,126,150)',
+                    font: {
+                      size: 20
+                    }
+                  },
                 },
                 ['y-axis-2']: {
                   id: 'y-axis-2',
                   type: 'linear',
                   position: 'right',
+                  ticks: {
+                    color: 'white',
+                    font: {
+                      size: 20
+                    }
+                  },
                 }
               },
               plugins: {
+                legend: {
+                  labels: {
+                    color: 'white',
+                    font: {
+                      size: 26
+                    }
+                  }
+                },
                 tooltip: {
                   callbacks: {
                     title: function(tooltipItems, data) {
@@ -232,14 +252,34 @@
                 id: 'y-axis-1',
                 type: 'linear',
                 position: 'left',
+                ticks: {
+                  color: 'rgb(110,225,64)',
+                  font: {
+                    size: 20
+                  }
+                },
               },
               ['y-axis-2']: {
                 id: 'y-axis-2',
                 type: 'linear',
                 position: 'right',
+                ticks: {
+                  color: 'rgb(255,126,150)',
+                  font: {
+                    size: 20
+                  }
+                },
               }
             },
             plugins: {
+              legend: {
+                labels: {
+                  color: 'white',
+                  font: {
+                    size: 26
+                  }
+                }
+              },
               tooltip: {
                 callbacks: {
                   title: function (tooltipItems, data) {
