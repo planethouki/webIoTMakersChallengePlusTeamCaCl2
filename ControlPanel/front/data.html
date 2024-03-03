@@ -106,9 +106,15 @@
             humidityData.push({x: ts, y: Number(humidity)})
         }
 
-        const chartDistance = distanceData.filter(({ y }) => y < 2000)
-        const chartTemperature = temperatureData.filter(({ y }) => y < 100)
-        const chartHumidity = humidityData.filter(({ y }) => y < 100)
+        const chartDistance = distanceData
+          .filter(({ x }) => x > Date.now() - 1000 * 60 * 60 * 2)
+          .filter(({ y }) => y < 2000)
+        const chartTemperature = temperatureData
+          .filter(({ x }) => x > Date.now() - 1000 * 60 * 60 * 2)
+          .filter(({ y }) => y < 100)
+        const chartHumidity = humidityData
+          .filter(({ x }) => x > Date.now() - 1000 * 60 * 60 * 2)
+          .filter(({ y }) => y < 100)
 
         if (chart1.value !== null) {
           chart1.value.destroy()
@@ -180,10 +186,12 @@
 
         const chartSpread = responseSpread
           .result
+          .filter(({ ts }) => ts > Date.now() - 1000 * 60 * 60 * 12)
           .map(({ ts }) => ({x: ts, y: 1}))
 
         const chartRemaining = responseRemaining
           .result
+          .filter(({ ts }) => ts > Date.now() - 1000 * 60 * 60 * 12)
           .map(({ ts, data }) => {
             const [remaining] = data.toString().split(',')
             return {x: ts, y: remaining}
